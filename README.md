@@ -15,10 +15,12 @@ VictoriaMetrics installation files are packaged as precompiled binaries and are 
 ```
 $ curl -L https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/v1.88.1/victoria-metrics-linux-amd64-v1.88.1.tar.gz --output victoria-metrics-linux-amd64-v1.88.1.tar.gz
 ```
-Extract the VictoriaMetrics executable to /usr/local/bin.
+The victoria-metrics-linux-amd64-v1.88.1.tar.gz contains only victoria-metrics-prod . Extract the victoria-metrics-prod executable to /usr/local/bin.
 ```
 $ sudo tar xvf victoria-metrics-amd64-*.tar.gz -C /usr/local/bin/
 ```
+
+
 Modify the ownership of executable:
 ```
 $ sudo chown -v root:root /usr/local/bin/victoria-metrics-prod
