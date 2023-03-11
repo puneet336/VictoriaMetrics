@@ -17,7 +17,7 @@ $ curl -L https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/v
 ```
 The victoria-metrics-linux-amd64-v1.88.1.tar.gz contains only victoria-metrics-prod . Extract the victoria-metrics-prod executable to /usr/local/bin.
 ```
-$ sudo tar xvf victoria-metrics-amd64-*.tar.gz -C /usr/local/bin/
+$ sudo tar -xf victoria-metrics-linux-amd64*.tar.gz -C /usr/local/bin/
 ```
 
 
@@ -32,6 +32,9 @@ Create a directory for VictoriaMetrics data and set owner:
 $ sudo mkdir -v /var/lib/victoria-metrics-data
 $ sudo chown -v victoriametrics:victoriametrics /var/lib/victoria-metrics-data
 ```
+Expected output - 
+>changed ownership of ‘/usr/local/bin/victoria-metrics-prod’ from 1000:1000 to root:root
+
 Create new systemd services.
 ```
 $ sudo vi /etc/systemd/system/victoriametrics.service
@@ -75,7 +78,40 @@ Enable and start VictoriaMetrics service to run on system boot automatically.
 ```
 $ sudo systemctl enable victoriametrics.service --now
 ```
+
 ## Verify VictoriaMetrics
+
+Check Service status - 
+```
+$sudo systemctl status victoriametrics.service
+```
+
+Expected Output - 
+```
+victoriametrics.service - High-performance, cost-effective and scalable time series database, long-term remote storage for Prometheus
+   Loaded: loaded (/etc/systemd/system/victoriametrics.service; disabled; vendor preset: disabled)
+   Active: active (running) since Sat 2023-03-11 09:05:51 MST; 10s ago
+  Process: 7990 ExecStop=/bin/kill -s SIGTERM $MAINPID (code=exited, status=0/SUCCESS)
+ Main PID: 7993 (victoria-metric)
+    Tasks: 13
+   Memory: 11.1M
+   CGroup: /system.slice/victoriametrics.service
+           └─7993 /usr/local/bin/victoria-metrics-prod -storageDataPath=/var/lib/victoria-metrics-data -httpListenAddr=127.0.0.1:8428 -retentionPeriod=1
+
+Mar 11 09:05:51 server2.lab.com victoria-metrics-prod[7993]: 2023-03-11T16:05:51.152Z        info        VictoriaMetrics/lib/mergeset/table.go:319      ...9AB8"...
+Mar 11 09:05:51 server2.lab.com victoria-metrics-prod[7993]: 2023-03-11T16:05:51.157Z        info        VictoriaMetrics/lib/mergeset/table.go:359      ...Bytes: 0
+Mar 11 09:05:51 server2.lab.com victoria-metrics-prod[7993]: 2023-03-11T16:05:51.158Z        info        VictoriaMetrics/lib/mergeset/table.go:319      ...9AB7"...
+Mar 11 09:05:51 server2.lab.com victoria-metrics-prod[7993]: 2023-03-11T16:05:51.164Z        info        VictoriaMetrics/lib/mergeset/table.go:359      ...Bytes: 0
+Mar 11 09:05:51 server2.lab.com victoria-metrics-prod[7993]: 2023-03-11T16:05:51.168Z        info        VictoriaMetrics/app/vmstorage/main.go:124      ...Bytes: 0
+Mar 11 09:05:51 server2.lab.com victoria-metrics-prod[7993]: 2023-03-11T16:05:51.170Z        info        VictoriaMetrics/app/vmselect/promql/rollup_resu...sult"...
+Mar 11 09:05:51 server2.lab.com victoria-metrics-prod[7993]: 2023-03-11T16:05:51.171Z        info        VictoriaMetrics/app/vmselect/promql/rollup_resu...Bytes: 0
+Mar 11 09:05:51 server2.lab.com victoria-metrics-prod[7993]: 2023-03-11T16:05:51.172Z        info        VictoriaMetrics/app/victoria-metrics/main.go:70... seconds
+Mar 11 09:05:51 server2.lab.com victoria-metrics-prod[7993]: 2023-03-11T16:05:51.172Z        info        VictoriaMetrics/lib/httpserver/httpserver.go:96....1:8428/
+Mar 11 09:05:51 server2.lab.com victoria-metrics-prod[7993]: 2023-03-11T16:05:51.172Z        info        VictoriaMetrics/lib/httpserver/httpserver.go:97...g/pprof/
+Hint: Some lines were ellipsized, use -l to show in full.
+```
+
+
 Check if you can get access to VictoriaMetrics via API:
 ```
 $ curl http://localhost:8428/api/v1/query -d 'query={job=~".*"}'
